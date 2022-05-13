@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, div#app {
+    @apply w-screen h-screen;
+}
+
+div#app {
+    @apply bg-gray-800 text-gray-100;
+}
+
+.header {
+    @apply fixed top-0 inset-x-0 h-header bg-gray-700 border border-gray-800;
+}
+
+.footer {
+    @apply fixed bottom-0 inset-x-0 h-footer bg-gray-700 border border-gray-800;
+}
+
+.nav {
+    @apply w-64 bg-gray-700 border border-gray-800;
+}
+
+.content {
+    @apply flex-grow p-5 overflow-y-scroll;
+}
