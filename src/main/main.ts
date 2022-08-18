@@ -1,4 +1,4 @@
-import {app, BrowserWindow, protocol, session, ipcMain} from "electron";
+import {app, BrowserWindow, ipcMain, protocol, session} from "electron";
 import {normalize} from "path";
 
 import {loadImages} from "./images/images";
@@ -7,13 +7,15 @@ import {loadImages} from "./images/images";
 // plugin that tells the Electron app where to look for the Webpack-bundled app code (depending on
 // whether you're running in development or production).
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
-declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY : string;
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
     // eslint-disable-line global-require
     app.quit();
 }
+
+const isDevelopment = process.env.NODE_ENV === "development" || process.env.DEBUG_PROD === "true";
 
 const createWindow = (): void => {
     // Create the browser window.
@@ -22,7 +24,9 @@ const createWindow = (): void => {
         width: 1280,
         darkTheme: true,
         webPreferences: {
-            preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
+            nodeIntegration: true,
+            preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+            webSecurity: !isDevelopment
         },
     });
 
@@ -39,19 +43,24 @@ app.whenReady().then(() => {
             responseHeaders: {
                 ...details.responseHeaders,
                 // "Content-Security-Policy": [
-                    // "style-src-attr 'self'",
-                    // "script-src 'self' chrome-extension://hmaebnndhhjkacnkmodhhhgoelakoiii/main.html",
-                    // "script-src-elem 'self'",
-                    // "img-src 'self'",
-                    // "default-src 'none'",
+                // "style-src-attr 'self'",
+                // "script-src 'self' chrome-extension://hmaebnndhhjkacnkmodhhhgoelakoiii/main.html",
+                // "script-src-elem 'self'",
+                // "img-src 'self'",
+                // "default-src 'none'",
                 // ]
             }
         });
     });
 });
 
-const isDevelopment = process.env.NODE_ENV === "development" || process.env.DEBUG_PROD === "true";
+protocol.registerSchemesAsPrivileged([
+    {scheme: "media", privileges: {bypassCSP: true}},
+]);
 
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
     if (!isDevelopment) {
         return;
@@ -62,27 +71,19 @@ app.whenReady().then(async () => {
     installExtension.default(REACT_DEVELOPER_TOOLS)
         .then((name) => console.log(`Added Extension:  ${name}`))
         .catch((err) => console.log("An error occurred: ", err));
-});
 
-app.whenReady().then(() => {
-    protocol.registerFileProtocol("image", (request, callback) => {
-        if (request.method !== "GET" || !request.url.endsWith(".png")) {
-            callback({statusCode: 403});
-        }
-        const url = request.url.replace("file://", "");
+    protocol.registerFileProtocol("media", (request, callback) => {
+        console.log(request.url);
+        const url = decodeURIComponent(request.url.substring("media://".length));
+        console.log(url);
         callback({path: normalize(`${__dirname}/${url}`)});
     });
-});
 
-app.whenReady().then(() => {
     ipcMain.handle("quit", app.quit);
     ipcMain.handle("loadImages", loadImages);
-});
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(createWindow);
+    await createWindow();
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

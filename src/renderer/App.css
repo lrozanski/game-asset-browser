@@ -19,9 +19,17 @@ div#app {
 }
 
 .nav {
-    @apply w-64 bg-gray-700 border border-gray-800;
+    @apply w-64 bg-gray-700 border border-gray-800 p-2;
+}
+
+.nav-button {
+    @apply flex flex-row align-middle text-left px-5 py-2 mb-2 bg-gray-600 rounded-lg;
+}
+
+.nav-button:hover {
+    @apply bg-gray-500;
 }
 
 .content {
-    @apply flex-grow p-5 overflow-y-scroll;
+    @apply flex-grow p-5 overflow-y-auto;
 }
