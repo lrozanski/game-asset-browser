@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-white;
+}
+
+.app {
+  @apply h-screen w-screen max-w-[100vw] bg-zinc-900 text-lg text-zinc-300;
+}
+
+.image-pixelated {
+  image-rendering: pixelated;
+  image-resolution: snap;
+}
+
+.selected {
+  @apply bg-zinc-700;
+}
+
+.collapsed {
+  @apply w-16 overflow-hidden;
+}
+
+.gutter {
+  scrollbar-gutter: stable both-edges;
+}

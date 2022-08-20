@@ -3,6 +3,7 @@ import {app, BrowserWindow, dialog, ipcMain} from 'electron';
 import {join} from 'path';
 import {URL} from 'url';
 import protocol = Electron.protocol;
+import {loadImages} from '/@/assets/images';
 
 protocol.registerSchemesAsPrivileged([{scheme: 'assets', privileges: {bypassCSP: true}}]);
 
@@ -27,20 +28,6 @@ async function createWindow() {
 
     callback({path: newUrl});
   });
-
-  function loadImages() {
-    const paths = dialog.showOpenDialogSync({
-      properties: ['openFile', 'multiSelections'],
-      filters: [
-        {
-          name: 'Image',
-          extensions: ['jpeg', 'jpg', 'png'],
-        },
-      ],
-    }) ?? [];
-
-    return paths.map(path => `assets://${path.replaceAll('\\', '/')}`);
-  }
 
   ipcMain.handle('loadImages', loadImages);
 
