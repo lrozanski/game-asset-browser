@@ -1,6 +1,6 @@
 import {MouseEvent, MouseEventHandler} from "react"
 
-import {useClassName} from "../../hooks/className"
+import {useClassName} from "/@/hooks/className"
 
 export type ImageSize = "xs" | "sm" | "md" | "lg" | "xl" | "full"
 

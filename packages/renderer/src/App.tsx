@@ -1,4 +1,4 @@
-import {useAtom, useAtomValue, useSetAtom} from "jotai"
+import {useAtom, useAtomValue} from "jotai"
 import {useState} from "react"
 import {AiFillFolder} from "react-icons/ai"
 import {MdArrowBackIosNew} from "react-icons/md"
@@ -6,15 +6,17 @@ import {MdArrowBackIosNew} from "react-icons/md"
 import {Image, ImageSize} from "./components/images/Image"
 import {ImageGrid} from "./components/images/ImageGrid"
 import {FlexGroup} from "./components/layout/FlexGroup"
+
 import {imageSizeState, previewImageSizeState, previewImageState} from "./state"
 import {loadImages} from "#preload"
+import {CustomSlider} from "/@/components/slider/Slider"
 
 function App() {
   const [imagePaths, setImagePaths] = useState<string[]>([])
   const [showPreview, setShowPreview] = useState<boolean>(true)
   const previewImage = useAtomValue(previewImageState)
 
-  const setImageSize = useSetAtom(imageSizeState)
+  const [imageSize, setImageSize] = useAtom(imageSizeState)
   const [previewImageSize, setPreviewImageSize] = useAtom(previewImageSizeState)
 
   return (
@@ -32,22 +34,13 @@ function App() {
           </button>
         </FlexGroup>
         <FlexGroup direction="vertical" className="relative h-screen grow overflow-y-auto overflow-x-hidden bg-zinc-900">
-          <FlexGroup direction="horizontal" className="sticky top-0 space-x-1 bg-zinc-700 p-2">
-            <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setImageSize("xs")}>
-              xs
-            </button>
-            <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setImageSize("sm")}>
-              sm
-            </button>
-            <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setImageSize("md")}>
-              md
-            </button>
-            <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setImageSize("lg")}>
-              lg
-            </button>
-            <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setImageSize("xl")}>
-              xl
-            </button>
+          <FlexGroup direction="horizontal" className="sticky top-0 space-x-1 bg-zinc-700 p-2 items-center">
+            <CustomSlider id="zoom-slider-2"
+                          label="Zoom:"
+                          initialValue={imageSize}
+                          choices={["xs", "sm", "md", "lg", "xl"]}
+                          onChange={newValue => setImageSize(newValue as ImageSize)}
+                          choiceLabelMapper={choice => choice} />
           </FlexGroup>
           <FlexGroup direction="vertical" className="relative grow overflow-y-auto bg-zinc-900 p-5">
             <ImageGrid paths={imagePaths} />
@@ -73,24 +66,12 @@ function App() {
                 {previewImage && <Image key={previewImage} src={previewImage} size={previewImageSize} stretch={true} pixelated={true} />}
               </FlexGroup>
               <FlexGroup direction="horizontal" className="sticky top-0 space-x-1 rounded-lg bg-zinc-700 p-2">
-                <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setPreviewImageSize("xs")}>
-                  xs
-                </button>
-                <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setPreviewImageSize("sm")}>
-                  sm
-                </button>
-                <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setPreviewImageSize("md")}>
-                  md
-                </button>
-                <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setPreviewImageSize("lg")}>
-                  lg
-                </button>
-                <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setPreviewImageSize("xl")}>
-                  xl
-                </button>
-                <button className="rounded-lg bg-zinc-800 px-2 py-1 hover:bg-zinc-500" onClick={() => setPreviewImageSize("full")}>
-                  full
-                </button>
+                <CustomSlider id="zoom-slider-2"
+                              label="Zoom:"
+                              initialValue={previewImageSize}
+                              choices={["xs", "sm", "md", "lg", "xl", "full"]}
+                              onChange={newValue => setPreviewImageSize(newValue as ImageSize)}
+                              choiceLabelMapper={choice => choice} />
               </FlexGroup>
             </>
           </FlexGroup>
