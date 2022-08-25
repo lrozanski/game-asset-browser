@@ -6,18 +6,19 @@ import {MdArrowBackIosNew} from "react-icons/md"
 import {Image, ImageSize} from "./components/images/Image"
 import {ImageGrid} from "./components/images/ImageGrid"
 import {FlexGroup} from "./components/layout/FlexGroup"
-
-import {imageSizeState, previewImageSizeState, previewImageState} from "./state"
+import {CustomSlider} from "./components/slider/Slider"
+import {ContentToolbar} from "./components/layout/ContentToolbar"
+import {previewImageSizeState, previewImageState} from "./state"
 import {loadImages} from "#preload"
-import {CustomSlider} from "/@/components/slider/Slider"
+import {Modal} from "/@/components/modal/Modal"
 
 function App() {
   const [imagePaths, setImagePaths] = useState<string[]>([])
   const [showPreview, setShowPreview] = useState<boolean>(true)
   const previewImage = useAtomValue(previewImageState)
 
-  const [imageSize, setImageSize] = useAtom(imageSizeState)
   const [previewImageSize, setPreviewImageSize] = useAtom(previewImageSizeState)
+  const [showModal, setShowModal] = useState(false)
 
   return (
     <div className="app overflow-x-hidden">
@@ -29,19 +30,13 @@ function App() {
               const images = await loadImages()
 
               setImagePaths(images)
+              setShowModal(true)
             }}>
             <AiFillFolder className="h-8 w-8 text-zinc-200" />
           </button>
         </FlexGroup>
         <FlexGroup direction="vertical" className="relative h-screen grow overflow-y-auto overflow-x-hidden bg-zinc-900">
-          <FlexGroup direction="horizontal" className="sticky top-0 space-x-1 bg-zinc-700 p-2 items-center">
-            <CustomSlider id="zoom-slider-2"
-                          label="Zoom:"
-                          initialValue={imageSize}
-                          choices={["xs", "sm", "md", "lg", "xl"]}
-                          onChange={newValue => setImageSize(newValue as ImageSize)}
-                          choiceLabelMapper={choice => choice} />
-          </FlexGroup>
+          <ContentToolbar />
           <FlexGroup direction="vertical" className="relative grow overflow-y-auto bg-zinc-900 p-5">
             <ImageGrid paths={imagePaths} />
           </FlexGroup>
@@ -77,6 +72,13 @@ function App() {
           </FlexGroup>
         )}
       </FlexGroup>
+      {showModal && (
+        <Modal>
+          <h1 className="px-3 pt-2 pb-5 text-xl font-bold">Import Images</h1>
+          <ContentToolbar />
+          <ImageGrid paths={imagePaths} />
+        </Modal>
+      )}
     </div>
   )
 }
